@@ -32,24 +32,10 @@ var bar, slider;
  
 function init(){
 	
-	barRed = document.getElementById('Red');
-	sliderRed = document.getElementById('Redslider');
-	infoRed = document.getElementById('Redinfo');
-	barRed.addEventListener('mousedown', startSlide, false);	
-	barRed.addEventListener('mouseup', stopSlide, false);
-
-	barGreen = document.getElementById('Green');
-	sliderGreen = document.getElementById('Greenslider');
-	infoGreen = document.getElementById('Greeninfo');
-	barGreen.addEventListener('mousedown', startSlide, false);	
-	barGreen.addEventListener('mouseup', stopSlide, false);
-
-	barBlue = document.getElementById('Blue');
-	sliderBlue = document.getElementById('Blueslider');
-	infoBlue = document.getElementById('Blueinfo');
-	barBlue.addEventListener('mousedown', startSlide, false);	
-	barBlue.addEventListener('mouseup', stopSlide, false);
-
+	initSlide('Red');
+	initSlide('Green');
+	initSlide('Blue');
+	
 	infoBright = document.getElementById('Brightinfo');
 
 	displaybox = document.getElementById('displaybox')
@@ -58,8 +44,24 @@ function init(){
 	infoABY = document.getElementById('aby')
 	infoAWB = document.getElementById('awb')
 
-
 }
+
+function initSlide(str)
+
+	// Initializes a bar, a slider, and an info for a given string.
+	// Expects a "bar" with id str, a "slider" which is inside the bar with id str+"slider",
+	// and an "info" with id str+"info".
+	var bar = document.getElementById(str);
+	var slider = document.getElementById(str+'slider');
+	var info = document.getElementById(str+'info');
+
+	// If you click on a slider bar, it should start sliding. If you let go of the mouse
+	// or drag your cursor out of the slider bar, it should stop sliding.
+	bar.addEventListener('mousedown', startSlide, false);	
+	bar.addEventListener('mouseup', stopSlide, false);	
+	bar.addEventListener('mouseout', stopSlide, false);
+
+}	
  
 function startSlide(event){
 	var bar = event.currentTarget;
@@ -111,6 +113,17 @@ function moveSlide(event){
 
  
 function updateColor(){
+
+	barRed = document.getElementById('Red');
+	sliderRed = document.getElementById('Redslider');
+	infoRed = document.getElementById('Redinfo');
+	barGreen = document.getElementById('Green');
+	sliderGreen = document.getElementById('Greenslider');
+	infoGreen = document.getElementById('Greeninfo');
+	barBlue = document.getElementById('Blue');
+	sliderBlue = document.getElementById('Blueslider');
+	infoBlue = document.getElementById('Blueinfo');
+	
 
 	// The percentage that each bar is full
 	var perc_r = sliderRed.offsetWidth / barRed.offsetWidth;
