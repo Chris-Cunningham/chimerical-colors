@@ -58,7 +58,7 @@ function initSlide(str) {
 	// or drag your cursor out of the slider bar, it should stop sliding.
 	bar.addEventListener('mousedown', startSlide, false);	
 	bar.addEventListener('mouseup', stopSlide, false);	
-	bar.addEventListener('mouseout', stopSlide, false);
+	// This was a good idea, but actually caused a lot of problems. bar.addEventListener('mouseout', stopSlide, false);
 
 }	
  
