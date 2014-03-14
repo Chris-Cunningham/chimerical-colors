@@ -26,10 +26,41 @@
 }
  
 </style>
- 
+
+
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+   precision mediump float;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+    }
+</script>
+
+<script type="text/javascript" src="colorwebgl.js"></script>
+
+
 <script type="text/javascript">
 
-function init(){
+function init() {
 	
 	initSlide('Red');
 	initSlide('Green');
@@ -42,6 +73,9 @@ function init(){
 	infoAGR = document.getElementById('agr')
 	infoABY = document.getElementById('aby')
 	infoAWB = document.getElementById('awb')
+
+	// Startup for WebGL, found in the other script @ colorwebgl.js.
+	initWebGL();
 
 }
 
@@ -58,6 +92,7 @@ function initSlide(str) {
 	// or drag your cursor out of the slider bar, it should stop sliding.
 	bar.addEventListener('mousedown', startSlide, false);	
 	bar.addEventListener('mouseup', stopSlide, false);	
+	bar.addEventListener('mouseleave', stopSlide, false)
 	// This was a good idea, but actually caused a lot of problems. bar.addEventListener('mouseout', stopSlide, false);
 
 }	
@@ -163,6 +198,16 @@ function updateColor(){
 	// Set the display to that color.
 	displaybox.style.backgroundColor = color;
 
+	// Try to interact with webGL.
+	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+    colors = []
+    for (var i=0; i < 4; i++) {
+      //colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
+      colors = colors.concat([perc_r, perc_g, perc_b, 1.0]);
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+    drawScene();
+
 }
 
 </script>
@@ -195,9 +240,19 @@ function updateColor(){
  
 <br />
 
-<table id='displaybox' style='height:500px; width:500px; background-color:#888888'> 
-<tr><td align='center' valign='center'>X</td></tr></table>
+<table width="1000"><tr><td>
 
+	<table id='displaybox' style='height:500px; width:500px; background-color:#888888'> 
+	<tr><td align='center' valign='center'>X</td></tr></table>
+
+</td>
+<td>
+
+  <canvas id="glcanvas" width="500" height="500">
+    Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
+  </canvas>
+
+</td></tr></table>
 
 </body>
 </html>
