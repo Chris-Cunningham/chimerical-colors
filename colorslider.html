@@ -131,12 +131,6 @@ function moveSlide(event){
 	// Here is the percent full that it should become
 	var set_perc = ((((event.clientX - bar.offsetLeft) / bar.offsetWidth)).toFixed(2));
 
-	// Here is the conversion from a 0 to 1 scale to a -1 to 1 scale.
-	var set_value = -1 + set_perc*2;
-
-	// Update the infobox with the percentage
-	info.innerHTML = bar.id + ' : ' + (set_value).toFixed(2);
-
 	//Set the slider to the correct size.
 	slider.style.width = (set_perc * 100) + '%';
 
@@ -145,6 +139,19 @@ function moveSlide(event){
 
 }
 
+function setColor(r,g,b) {
+
+
+	sliderRed = document.getElementById('Redslider');
+	sliderGreen = document.getElementById('Greenslider');
+	sliderBlue = document.getElementById('Blueslider');
+
+	sliderRed.style.width = r + '%';
+	sliderGreen.style.width = g + '%';
+	sliderBlue.style.width = b + '%';
+
+	updateColor();
+}
  
 function updateColor(){
 
@@ -164,11 +171,11 @@ function updateColor(){
 	var perc_g = sliderGreen.offsetWidth / barGreen.offsetWidth;
 	var perc_b = sliderBlue.offsetWidth / barBlue.offsetWidth;
 
-	// Convert it from a scale of 0 to 1 to a scale from -1 to 1
-	// (Such a conversion is a line with slope 2 and intercept -1)
-	var value_r = -1 + perc_r*2;
-	var value_g = -1 + perc_g*2;
-	var value_b = -1 + perc_b*2;
+	// Convert it from a scale of 0 to 0.99 to a scale from -1 to 1
+	// (Such a conversion is a line with slope 200/99 and intercept -1)
+	var value_r = -1 + perc_r*200/99;
+	var value_g = -1 + perc_g*200/99;
+	var value_b = -1 + perc_b*200/99;
 	var value_bright = (value_r + value_g + value_b)/3
 
 	// Do the matrix transformation that makes color vision work
@@ -177,6 +184,10 @@ function updateColor(){
 	var value_awb = value_bright;
 
 	// Display the end result of the color info.
+	infoRed.innerHTML = 'Red : ' + (value_r).toFixed(2);
+	infoGreen.innerHTML = 'Green : ' + (value_g).toFixed(2);
+	infoBlue.innerHTML = 'Blue : ' + (value_b).toFixed(2);
+	infoBright.innerHTML = 'Bright : ' + (value_bright).toFixed(2);
 	infoAGR.innerHTML = 'A(G/R) : ' + (value_agr).toFixed(2);
 	infoABY.innerHTML = 'A(B/Y) : ' + (value_aby).toFixed(2);
 	infoAWB.innerHTML = 'A(W/B) : ' + (value_awb).toFixed(2);
@@ -224,16 +235,34 @@ function updateColor(){
 
 <table>
 <tr>
-<td>
+<td valign='top'>
 	<div id='Redinfo' class='info'>Red: 0</div> 
 	<div id='Greeninfo' class='info'>Green: 0</div> 
 	<div id='Blueinfo' class='info'>Blue: 0</div>
 	<div id='Brightinfo' class='info'>Bright: 0</div>
 </td>
-<td>
+<td valign='top'>
 	<div id='agr' class='info'> A(G/R) = 0</div>
 	<div id='aby' class='info'> A(B/Y) = 0</div>
 	<div id='awb' class='info'> A(W/B) = -1</div>
+</td>
+<td valign='top'>
+	<center><b>Basic Presets</b><br>
+	<input type='button' style='width:80px' value='Black' onClick='setColor(0,0,0)'><br>
+	<input type='button' style='width:80px' value='Gray' onClick='setColor(50,50,50)'><br>
+	<input type='button' style='width:80px' value='White' onClick='setColor(100,100,100)'><br>
+</td>
+<td valign='top'>
+	<center><b>Tricky Yellow</b><br>
+	<input type='button' style='width:80px' value='Start' onClick='setColor(0,0,100)'><br>
+	<input type='button' style='width:80px' value='End' onClick='setColor(50,50,50)'><br>
+	<br>
+</td>
+<td valign='top'>
+	<center><b>Stygian Blue</b><br>
+	<input type='button' style='width:80px' value='Start' onClick='setColor(100,100,0)'><br>
+	<input type='button' style='width:80px' value='End' onClick='setColor(0,0,0)'><br>
+	<br>
 </td>
 </tr>
 </table>
