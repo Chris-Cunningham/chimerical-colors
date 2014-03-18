@@ -275,9 +275,17 @@ function chimerical(color){
 			alert(instructions);
 			// red on red
 			setColor(1,100,0,0); setColor(2,100,0,0);
-			alert('You should see a blue circle.')
+			alert('It isn\'t possible to get more red than red, so you should see just red.')
 			break;
 
+		case 'hyperbolicorange':
+			// teal on gray
+			setColor(1,50,50,50); setColor(2,0,75,75)
+			alert(instructions);
+			// orange on orange
+			setColor(1,100,50,0); setColor(2,100,50,0)
+			alert('You should see an impossibly saturated orange.')
+			break;
 
 		case 'stygianblue':
 			// Yellow on gray
@@ -336,6 +344,7 @@ function chimerical(color){
 
 	<input type='button' style='width:120px' value='Stygian Blue' onClick='chimerical("stygianblue")'><br>
 	<input type='button' style='width:120px' value='Extremely Red' onClick='chimerical("extremelyred")'><br>
+	<input type='button' style='width:120px' value='Hyperbolic Orange' onClick='chimerical("hyperbolicorange")'><br>
 </td>
 </tr>
 </table>
