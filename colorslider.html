@@ -62,18 +62,13 @@
 
 function init() {
 	
-	initSlide('Red');
-	initSlide('Green');
-	initSlide('Blue');
+	initSlide('Red1');
+	initSlide('Green1');
+	initSlide('Blue1');
+	initSlide('Red2');
+	initSlide('Green2');
+	initSlide('Blue2');
 	
-	infoBright = document.getElementById('Brightinfo');
-
-	displaybox = document.getElementById('displaybox')
-
-	infoAGR = document.getElementById('agr')
-	infoABY = document.getElementById('aby')
-	infoAWB = document.getElementById('awb')
-
 	// Startup for WebGL, found in the other script @ colorwebgl.js.
 	initWebGL();
 
@@ -122,6 +117,9 @@ function moveSlide(event){
 	// The bar that got clicked on is the event's current target
 	var bar = event.currentTarget;
 
+	// There are two sets of sliders now, sliderset 1 and sliderset 2. The last character of the id is the sliderset. This just grabs the last character.
+	var sliderset = bar.id.slice(-1)
+
 	// The slider inside the bar has the same id except with 'slider' tacked on
 	var slider = document.getElementById(event.currentTarget.id + 'slider')
 
@@ -135,36 +133,39 @@ function moveSlide(event){
 	slider.style.width = (set_perc * 100) + '%';
 
 	// Call the function that makes the box the correct color.
-	updateColor();
+	updateColor(sliderset);
 
 }
 
-function setColor(r,g,b) {
+function setColor(sliderset,r,g,b) {
 
-
-	sliderRed = document.getElementById('Redslider');
-	sliderGreen = document.getElementById('Greenslider');
-	sliderBlue = document.getElementById('Blueslider');
+	sliderRed = document.getElementById('Red'+sliderset+'slider');
+	sliderGreen = document.getElementById('Green'+sliderset+'slider');
+	sliderBlue = document.getElementById('Blue'+sliderset+'slider');
 
 	sliderRed.style.width = r + '%';
 	sliderGreen.style.width = g + '%';
 	sliderBlue.style.width = b + '%';
 
-	updateColor();
+	updateColor(sliderset);
 }
  
-function updateColor(){
+function updateColor(sliderset){
 
-	barRed = document.getElementById('Red');
-	sliderRed = document.getElementById('Redslider');
-	infoRed = document.getElementById('Redinfo');
-	barGreen = document.getElementById('Green');
-	sliderGreen = document.getElementById('Greenslider');
-	infoGreen = document.getElementById('Greeninfo');
-	barBlue = document.getElementById('Blue');
-	sliderBlue = document.getElementById('Blueslider');
-	infoBlue = document.getElementById('Blueinfo');
-	
+	barRed = document.getElementById('Red'+sliderset);
+	sliderRed = document.getElementById('Red'+sliderset+'slider');
+	infoRed = document.getElementById('Red'+sliderset+'info');
+	barGreen = document.getElementById('Green'+sliderset);
+	sliderGreen = document.getElementById('Green'+sliderset+'slider');
+	infoGreen = document.getElementById('Green'+sliderset+'info');
+	barBlue = document.getElementById('Blue'+sliderset);
+	sliderBlue = document.getElementById('Blue'+sliderset+'slider');
+	infoBlue = document.getElementById('Blue'+sliderset+'info');
+	infoAGR = document.getElementById('agr'+sliderset)
+	infoABY = document.getElementById('aby'+sliderset)
+	infoAWB = document.getElementById('awb'+sliderset)
+	infoBright = document.getElementById('Bright'+sliderset+'info')
+	displaybox = document.getElementById('displaybox'+sliderset)
 
 	// The percentage that each bar is full
 	var perc_r = sliderRed.offsetWidth / barRed.offsetWidth;
@@ -209,6 +210,22 @@ function updateColor(){
 	// Set the display to that color.
 	displaybox.style.backgroundColor = color;
 
+	// Set the display font to white if we go below a certain threshold of brightness.
+	if (value_bright < -0.33) 
+		displaybox.style.color='white'
+	else if(value_bright < 0.33) {
+		// Code to gradually change the X color from white to black ... abandoned in favor of only changing in extreme circumstances.
+
+		// x = -0.33, y = 256 ... x = 0.33, y = 0. Slope = -384, pointslope form.
+		// Convert to hex string with .toString(16).
+		// Xcolor = (Math.floor(-384 * (value_bright - 0.33))).toString(16);
+		// Pad small hex numbers with zeroes.
+		// Xcolorstring = "00".substr(0, 2 - Xcolor.length) + Xcolor;
+		// displaybox.style.color = '#'+Xcolorstring+Xcolorstring+Xcolorstring; 
+	}
+	else
+		displaybox.style.color='black';
+	
 	// Try to interact with webGL.
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
     colors = []
@@ -221,48 +238,96 @@ function updateColor(){
 
 }
 
+function chimerical(color){
+
+	instructions = 'Stare at the X in the center of the circle for 30 seconds. Press enter (OK) while still staring at the X.'
+
+	switch(color){
+
+		case 'trickyyellow':
+			// blue on gray
+			setColor(1,50,50,50); setColor(2,0,0,100);
+			alert(instructions);
+			// gray on gray
+			setColor(1,50,50,50); setColor(2,50,50,50);
+			alert('You should see a yellow circle.')
+			break;
+		case 'trickygreen':
+			// red on gray
+			setColor(1,50,50,50); setColor(2,100,0,0);
+			alert(instructions);
+			// gray on gray
+			setColor(1,50,50,50); setColor(2,50,50,50);
+			alert('You should see a green circle.')
+			break;
+		case 'trickyblue':
+			// blue on gray
+			setColor(1,50,50,50); setColor(2,100,100,0);
+			alert(instructions);
+			// gray on gray
+			setColor(1,50,50,50); setColor(2,50,50,50);
+			alert('You should see a blue circle.')
+			break;
+
+
+
+
+		case 'stygianblue':
+			// Yellow on gray
+			setColor(1,50,50,50); setColor(2,100,100,0);
+			alert(instructions);
+			// Black on black
+			setColor(1,0,0,0);    setColor(2,0,0,0);
+			alert('You should see an impossibly dark blue circle.')
+			break;
+	}
+}
+
+
 </script>
  
 </head>
 <body onload='init()'>
- 
-<div id='Red' class='bar'><div id='Redslider' class='slider' style='background-color:red; width:50%'></div></div>
-<div id='Green' class='bar'><div id='Greenslider' class='slider' style='background-color:green; width:50%'></div></div>
-<div id='Blue' class='bar'><div id='Blueslider' class='slider' style='background-color:blue; width:50%'></div></div>
-
-<br />
- 
 
 <table>
+
 <tr>
-<td valign='top'>
-	<div id='Redinfo' class='info'>Red: 0</div> 
-	<div id='Greeninfo' class='info'>Green: 0</div> 
-	<div id='Blueinfo' class='info'>Blue: 0</div>
-	<div id='Brightinfo' class='info'>Bright: 0</div>
+<td valign='top'><h2>Background</h2>
+	<div id='Red1' class='bar'><div id='Red1slider' class='slider' style='background-color:red; width:50%'></div></div>
+	<div id='Green1' class='bar'><div id='Green1slider' class='slider' style='background-color:green; width:50%'></div></div>
+	<div id='Blue1' class='bar'><div id='Blue1slider' class='slider' style='background-color:blue; width:50%'></div></div>
+
+	<div id='Red1info' class='info'>Red: 0</div> 
+	<div id='Green1info' class='info'>Green: 0</div> 
+	<div id='Blue1info' class='info'>Blue: 0</div>
+	<div id='Bright1info' class='info'>Bright: 0</div>
+
+	<div id='agr1' class='info'> A(G/R) = 0</div>
+	<div id='aby1' class='info'> A(B/Y) = 0</div>
+	<div id='awb1' class='info'> A(W/B) = -1</div>
+</td>
+<td valign='top'><h2>Foreground</h2>
+	<div id='Red2' class='bar'><div id='Red2slider' class='slider' style='background-color:red; width:50%'></div></div>
+	<div id='Green2' class='bar'><div id='Green2slider' class='slider' style='background-color:green; width:50%'></div></div>
+	<div id='Blue2' class='bar'><div id='Blue2slider' class='slider' style='background-color:blue; width:50%'></div></div>
+
+	<div id='Red2info' class='info'>Red: 0</div> 
+	<div id='Green2info' class='info'>Green: 0</div> 
+	<div id='Blue2info' class='info'>Blue: 0</div>
+	<div id='Bright2info' class='info'>Bright: 0</div>
+
+	<div id='agr2' class='info'> A(G/R) = 0</div>
+	<div id='aby2' class='info'> A(B/Y) = 0</div>
+	<div id='awb2' class='info'> A(W/B) = -1</div>
 </td>
 <td valign='top'>
-	<div id='agr' class='info'> A(G/R) = 0</div>
-	<div id='aby' class='info'> A(B/Y) = 0</div>
-	<div id='awb' class='info'> A(W/B) = -1</div>
-</td>
-<td valign='top'>
-	<center><b>Basic Presets</b><br>
-	<input type='button' style='width:80px' value='Black' onClick='setColor(0,0,0)'><br>
-	<input type='button' style='width:80px' value='Gray' onClick='setColor(50,50,50)'><br>
-	<input type='button' style='width:80px' value='White' onClick='setColor(100,100,100)'><br>
-</td>
-<td valign='top'>
-	<center><b>Tricky Yellow</b><br>
-	<input type='button' style='width:80px' value='Start' onClick='setColor(0,0,100)'><br>
-	<input type='button' style='width:80px' value='End' onClick='setColor(50,50,50)'><br>
-	<br>
-</td>
-<td valign='top'>
-	<center><b>Stygian Blue</b><br>
-	<input type='button' style='width:80px' value='Start' onClick='setColor(100,100,0)'><br>
-	<input type='button' style='width:80px' value='End' onClick='setColor(0,0,0)'><br>
-	<br>
+	<center><b>Fun Color Programs</b><br>
+	<input type='button' style='width:120px' value='Tricky Yellow' onClick='chimerical("trickyyellow")'><br>
+	<input type='button' style='width:120px' value='Tricky Green' onClick='chimerical("trickygreen")'><br>
+	<input type='button' style='width:120px' value='Tricky Blue' onClick='chimerical("trickyblue")'><br>
+
+
+	<input type='button' style='width:120px' value='Stygian Blue' onClick='chimerical("stygianblue")'><br>
 </td>
 </tr>
 </table>
@@ -271,9 +336,9 @@ function updateColor(){
 
 <table width="1000"><tr><td>
 
-	<table id='displaybox' style='height:500px; width:500px; background-color:#888888'> 
+	<table id='displaybox1' style='height:500px; width:500px; background-color:#808080'> 
 	<tr><td align='center' valign='center'>
-		<div id='circle' style='height:350px; width:350px; background-color:#888888; -webkit-border-radius: 100%; -moz-border-radius: 100%; border-radius: 100%; display:table-cell; vertical-align: middle;'>X</div>
+		<div id='displaybox2' style='height:350px; width:350px; background-color:#808080; -webkit-border-radius: 100%; -moz-border-radius: 100%; border-radius: 100%; display:table-cell; vertical-align: middle;'>X</div>
 	</td></tr></table>
 
 </td>
