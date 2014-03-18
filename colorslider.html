@@ -269,7 +269,14 @@ function chimerical(color){
 			alert('You should see a blue circle.')
 			break;
 
-
+		case 'extremelyred':
+			// green on gray
+			setColor(1,50,50,50); setColor(2,0,100,100);
+			alert(instructions);
+			// red on red
+			setColor(1,100,100,100); setColor(2,100,100,100);
+			alert('You should see a blue circle.')
+			break;
 
 
 		case 'stygianblue':
@@ -328,6 +335,7 @@ function chimerical(color){
 
 
 	<input type='button' style='width:120px' value='Stygian Blue' onClick='chimerical("stygianblue")'><br>
+	<input type='button' style='width:120px' value='Extremely Red' onClick='chimerical("extremelyred")'><br>
 </td>
 </tr>
 </table>
