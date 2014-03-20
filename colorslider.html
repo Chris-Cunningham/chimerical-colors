@@ -227,25 +227,72 @@ function updateColor(sliderset){
 	else
 		displaybox.style.color='black';
 	
-	// Interact with WebGL! 
+	// Interact with WebGL! There is a R square, a G square, and a B square.
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+	// 
+	// Update the R square. Note that vertices go from -1 to 1 and colors go from 0 to 1, so we use y = (x + 1)/2 to convert.
+	//
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferR);
+    var vertices = [
+        value_r,  1.0,   1.0,
+        value_r, -1.0,   1.0,
+        value_r,  1.0,  -1.0,
+        value_r, -1.0,  -1.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);    
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferR);
+    var colors = [
+        (value_r + 1)/2,  1.0,  1.0,  1.0,
+        (value_r + 1)/2,  0.0,  1.0,  1.0,
+        (value_r + 1)/2,  1.0,  0.0,  1.0,
+        (value_r + 1)/2,  0.0,  0.0,  1.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+	// 
+	// Update the G square. Note that vertices go from -1 to 1 and colors go from 0 to 1, so we use y = (x + 1)/2 to convert.
+	//
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferG);
     var vertices = [
          1.0,  value_g,  1.0,
         -1.0,  value_g,  1.0,
          1.0,  value_g, -1.0,
         -1.0,  value_g, -1.0
     ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);    
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferG);
     var colors = [
-         1.0,  value_g,  1.0,  1.0,
-        -1.0,  value_g,  1.0,  1.0,
-         1.0,  value_g, -1.0,  1.0,
-        -1.0,  value_g, -1.0,  1.0
+         1.0,  (value_g + 1)/2,  1.0,  1.0,
+         0.0,  (value_g + 1)/2,  1.0,  1.0,
+         1.0,  (value_g + 1)/2,  0.0,  1.0,
+         0.0,  (value_g + 1)/2,  0.0,  1.0
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+	// 
+	// Update the B square. Note that vertices go from -1 to 1 and colors go from 0 to 1, so we use y = (x + 1)/2 to convert.
+	//
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferB);
+    var vertices = [
+         1.0,  1.0,  value_b,
+        -1.0,  1.0,  value_b,
+         1.0, -1.0,  value_b,
+        -1.0, -1.0,  value_b
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);    
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferB);
+    var colors = [
+         1.0,  1.0,  (value_b + 1)/2,  1.0,
+         0.0,  1.0,  (value_b + 1)/2,  1.0,
+         1.0, -1.0,  (value_b + 1)/2,  1.0,
+         0.0, -1.0,  (value_b + 1)/2,  1.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+    //
+    //  Update the small cube that marks where we are.
+    //
+    prepareSmallCube(value_r, value_g, value_b, (value_r + 1)/2, (value_g + 1)/2, (value_b + 1)/2, 1.0)
 
     drawScene();												// This means "ok now draw the result please"
 

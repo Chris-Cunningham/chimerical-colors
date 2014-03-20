@@ -102,18 +102,56 @@ function setMatrixUniforms() {
     gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
 }
 
-var squareVertexPositionBuffer;
-var squareVertexColorBuffer;
+var squareVertexPositionBufferR;
+var squareVertexColorBufferR;
+var squareVertexPositionBufferG;
+var squareVertexColorBufferG;
+var squareVertexPositionBufferB;
+var squareVertexColorBufferB;
+
 var cubeVertexPositionBuffer;
 var cubeVertexColorBuffer;
 var cubeVertexIndexBuffer;
+
+var smallcubeVertexPositionBuffer;
+var smallcubeVertexColorBuffer;
+var smallcubeVertexIndexBuffer;
 
 var rSquare = 0;
 var rCube = 0;
 
 function initBuffers() {
-    squareVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+
+    //
+    // The red one should have the x-coordinate equal to the value_R, which starts at 0
+    //
+    squareVertexPositionBufferR = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferR);
+    var vertices = [
+         0.0,  1.0,  1.0,
+         0.0, -1.0,  1.0,
+         0.0,  1.0, -1.0,
+         0.0, -1.0, -1.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    squareVertexPositionBufferR.itemSize = 3;
+    squareVertexPositionBufferR.numItems = 4;
+    
+    squareVertexColorBufferR = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferR);
+    
+    // Color everything based on its RGB location.
+    colors = colorVerticesRGB(vertices);
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+    squareVertexColorBufferR.itemSize = 4;
+    squareVertexColorBufferR.numItems = 4;
+
+    //
+    // The green one should have the y-coordinate equal to the value_G, which starts at 0
+    //
+    squareVertexPositionBufferG = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferG);
     var vertices = [
          1.0,  0.0,  1.0,
         -1.0,  0.0,  1.0,
@@ -121,20 +159,49 @@ function initBuffers() {
         -1.0,  0.0, -1.0
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    squareVertexPositionBuffer.itemSize = 3;
-    squareVertexPositionBuffer.numItems = 4;
+    squareVertexPositionBufferG.itemSize = 3;
+    squareVertexPositionBufferG.numItems = 4;
     
-    squareVertexColorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
-    var colors = [
-         1.0,  0.0,  1.0,  1.0,
-        -1.0,  0.0,  1.0,  1.0,
-         1.0,  0.0, -1.0,  1.0,
-        -1.0,  0.0, -1.0,  1.0
-    ];
+    squareVertexColorBufferG = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferG);
+    
+    // Color everything based on its RGB location.
+    colors = colorVerticesRGB(vertices);
+
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-    squareVertexColorBuffer.itemSize = 4;
-    squareVertexColorBuffer.numItems = 4;
+    squareVertexColorBufferG.itemSize = 4;
+    squareVertexColorBufferG.numItems = 4;
+
+
+
+    //
+    // The blue one should have the z-coordinate equal to the value_B, which starts at 0
+    //
+    squareVertexPositionBufferB = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferB);
+    var vertices = [
+         1.0,  1.0,  0.0,
+        -1.0,  1.0,  0.0,
+         1.0, -1.0,  0.0,
+        -1.0, -1.0,  0.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    squareVertexPositionBufferB.itemSize = 3;
+    squareVertexPositionBufferB.numItems = 4;
+    
+    squareVertexColorBufferB = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferB);
+    
+    // Color everything based on its RGB location.
+    colors = colorVerticesRGB(vertices);
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+    squareVertexColorBufferB.itemSize = 4;
+    squareVertexColorBufferB.numItems = 4;
+
+
+    // Also draw a small cube at the origin with color 0.5, 0.5, 0.5, 1.0
+    prepareSmallCube(0, 0, 0, 0.5, 0.5, 0.5, 1.0);
 
 
     cubeVertexPositionBuffer = gl.createBuffer();
@@ -183,60 +250,8 @@ function initBuffers() {
     cubeVertexColorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
 
-
-    //colors = [
-      //[1.0, 0.0, 0.0, 1.0],     // Front face
-      //[1.0, 1.0, 0.0, 1.0],     // Back face
-      //[0.0, 1.0, 0.0, 1.0],     // Top face
-      //[1.0, 0.5, 0.5, 1.0],     // Bottom face
-      //[1.0, 0.0, 1.0, 1.0],     // Right face
-    //[0.0, 0.0, 1.0, 1.0],     // Left face
-    //];
-    //var unpackedColors = [];
-    //for (var i in colors) {
-    //var color = colors[i];
-    //for (var j=0; j < 4; j++) {
-    //        unpackedColors = unpackedColors.concat(color);
-      //}
-    //}
-    var opa = 1.0;
-    unpackedColors = [
-      // Front face
-      -1.0, -1.0,  1.0,  opa,
-       1.0, -1.0,  1.0,  opa,
-       1.0,  1.0,  1.0,  opa,
-      -1.0,  1.0,  1.0,  opa,
-
-      // Back face
-      -1.0, -1.0, -1.0,  opa,
-      -1.0,  1.0, -1.0,  opa,
-       1.0,  1.0, -1.0,  opa,
-       1.0, -1.0, -1.0,  opa,
-
-      // Top face
-      -1.0,  1.0, -1.0,  opa,
-      -1.0,  1.0,  1.0,  opa,
-       1.0,  1.0,  1.0,  opa,
-       1.0,  1.0, -1.0,  opa,
-
-      // Bottom face
-      -1.0, -1.0, -1.0,  opa,
-       1.0, -1.0, -1.0,  opa,
-       1.0, -1.0,  1.0,  opa,
-      -1.0, -1.0,  1.0,  opa,
-
-      // Right face
-       1.0, -1.0, -1.0,  opa,
-       1.0,  1.0, -1.0,  opa,
-       1.0,  1.0,  1.0,  opa,
-       1.0, -1.0,  1.0,  opa,
-
-      // Left face
-      -1.0, -1.0, -1.0,  opa,
-      -1.0, -1.0,  1.0,  opa,
-      -1.0,  1.0,  1.0,  opa,
-      -1.0,  1.0, -1.0,  opa
-    ]
+    // Color everything based on its RGB location.
+    unpackedColors = colorVerticesRGB(vertices);
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
     cubeVertexColorBuffer.itemSize = 4;
@@ -259,6 +274,103 @@ function initBuffers() {
 }
 
 
+function prepareSmallCube(x, y, z, cr, cg, cb, co) {
+
+    smallcubeVertexPositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, smallcubeVertexPositionBuffer);
+    vertices = [
+      // Front face
+      -1.0, -1.0,  1.0,
+       1.0, -1.0,  1.0,
+       1.0,  1.0,  1.0,
+      -1.0,  1.0,  1.0,
+
+      // Back face
+      -1.0, -1.0, -1.0,
+      -1.0,  1.0, -1.0,
+       1.0,  1.0, -1.0,
+       1.0, -1.0, -1.0,
+
+      // Top face
+      -1.0,  1.0, -1.0,
+      -1.0,  1.0,  1.0,
+       1.0,  1.0,  1.0,
+       1.0,  1.0, -1.0,
+
+      // Bottom face
+      -1.0, -1.0, -1.0,
+       1.0, -1.0, -1.0,
+       1.0, -1.0,  1.0,
+      -1.0, -1.0,  1.0,
+
+      // Right face
+       1.0, -1.0, -1.0,
+       1.0,  1.0, -1.0,
+       1.0,  1.0,  1.0,
+       1.0, -1.0,  1.0,
+
+      // Left face
+      -1.0, -1.0, -1.0,
+      -1.0, -1.0,  1.0,
+      -1.0,  1.0,  1.0,
+      -1.0,  1.0, -1.0,
+    ];
+
+    // Shrink the cube and move it to the right place.
+    numberofvertices = vertices.length / 3;
+    for (var i = 0; i < numberofvertices; i++) {
+        vertices[3*i]   = vertices[3*i]   / 3 + x;
+        vertices[3*i+1] = vertices[3*i+1] / 3 + y;
+        vertices[3*i+2] = vertices[3*i+2] / 3 + z;
+    };
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    smallcubeVertexPositionBuffer.itemSize = 3;
+    smallcubeVertexPositionBuffer.numItems = 24;
+
+    smallcubeVertexColorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, smallcubeVertexColorBuffer);
+
+    color = [cr, cg, cb, co];
+    var unpackedColors = [];
+    for (var j=0; j < 24; j++) {
+            unpackedColors = unpackedColors.concat(color);
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
+    smallcubeVertexColorBuffer.itemSize = 4;
+    smallcubeVertexColorBuffer.numItems = 24;
+
+    smallcubeVertexIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, smallcubeVertexIndexBuffer);
+    var cubeVertexIndices = [
+      0, 1, 2,      0, 2, 3,    // Front face
+      4, 5, 6,      4, 6, 7,    // Back face
+      8, 9, 10,     8, 10, 11,  // Top face
+      12, 13, 14,   12, 14, 15, // Bottom face
+      16, 17, 18,   16, 18, 19, // Right face
+      20, 21, 22,   20, 22, 23  // Left face
+    ]
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+    smallcubeVertexIndexBuffer.itemSize = 1;
+    smallcubeVertexIndexBuffer.numItems = 36;
+
+}
+
+function colorVerticesRGB(vertices) {
+
+    // To build the colors, we basically want to take x, y, z and hit them all with the function f(w) = (w+1)/2 since that sends -1 to 0 and 1 to 1.
+    colors = []
+    for (var i = 0; i < vertices.length / 3; i++) {
+        colors[4*i]     = (vertices[3*i]     + 1)/2;
+        colors[4*i + 1] = (vertices[3*i + 1] + 1)/2;
+        colors[4*i + 2] = (vertices[3*i + 2] + 1)/2;
+        colors[4*i + 3] = 1.0;
+    };
+
+    return colors;
+
+}
+
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -271,33 +383,60 @@ function drawScene() {
 
     mvPushMatrix();
     mat4.rotate(mvMatrix, degToRad(rSquare), [1, 0, 0]);
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-    
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferR);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBufferR.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferR);
+    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBufferR.itemSize, gl.FLOAT, false, 0, 0);
     setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
-    
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBufferR.numItems);
     mvPopMatrix();
 
     mvPushMatrix();
-    mat4.rotate(mvMatrix, degToRad(rCube), [1, 0, 0]);
+    mat4.rotate(mvMatrix, degToRad(rSquare), [1, 0, 0]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferG);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBufferG.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferG);
+    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBufferG.itemSize, gl.FLOAT, false, 0, 0);
+    setMatrixUniforms();
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBufferG.numItems);
+    mvPopMatrix();
 
+    mvPushMatrix();
+    mat4.rotate(mvMatrix, degToRad(rSquare), [1, 0, 0]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBufferB);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBufferB.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferB);
+    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBufferB.itemSize, gl.FLOAT, false, 0, 0);
+    setMatrixUniforms();
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBufferB.numItems);
+    mvPopMatrix();
+
+
+    mvPushMatrix();
+    mat4.rotate(mvMatrix, degToRad(rCube), [1, 0, 0]);
+    // We actually want this cube on the same coordinate system as the previous squares. mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, smallcubeVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, smallcubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, smallcubeVertexColorBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, smallcubeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, smallcubeVertexIndexBuffer);
+    setMatrixUniforms();
+    gl.drawElements(gl.TRIANGLES, smallcubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    mvPopMatrix();
+
+
+    mvPushMatrix();
+    mat4.rotate(mvMatrix, degToRad(rCube), [1, 0, 0]);
     mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cubeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
     setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-
     mvPopMatrix();
+
 
 }
 
