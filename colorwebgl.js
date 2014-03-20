@@ -104,10 +104,15 @@ function setMatrixUniforms() {
 
 var squareVertexPositionBufferR;
 var squareVertexColorBufferR;
+var squareVertexIndexBufferR;
+
 var squareVertexPositionBufferG;
 var squareVertexColorBufferG;
+var squareVertexIndexBufferG;
+
 var squareVertexPositionBufferB;
 var squareVertexColorBufferB;
+var squareVertexIndexBufferB;
 
 var cubeVertexPositionBuffer;
 var cubeVertexColorBuffer;
@@ -147,6 +152,16 @@ function initBuffers() {
     squareVertexColorBufferR.itemSize = 4;
     squareVertexColorBufferR.numItems = 4;
 
+    squareVertexIndexBufferR = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBufferR);
+    var squareVertexIndicesR = [
+      0, 1, 2,      1, 2, 3,    // A square is made of two triangles
+    ]
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(squareVertexIndicesR), gl.STATIC_DRAW);
+    squareVertexIndexBufferR.itemSize = 1;
+    squareVertexIndexBufferR.numItems = 6;
+
+
     //
     // The green one should have the y-coordinate equal to the value_G, which starts at 0
     //
@@ -172,7 +187,14 @@ function initBuffers() {
     squareVertexColorBufferG.itemSize = 4;
     squareVertexColorBufferG.numItems = 4;
 
-
+    squareVertexIndexBufferG = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBufferG);
+    var squareVertexIndicesG = [
+      0, 1, 2,      1, 2, 3,    // A square is made of two triangles
+    ]
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(squareVertexIndicesG), gl.STATIC_DRAW);
+    squareVertexIndexBufferG.itemSize = 1;
+    squareVertexIndexBufferG.numItems = 6;
 
     //
     // The blue one should have the z-coordinate equal to the value_B, which starts at 0
@@ -199,9 +221,19 @@ function initBuffers() {
     squareVertexColorBufferB.itemSize = 4;
     squareVertexColorBufferB.numItems = 4;
 
+    squareVertexIndexBufferB = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBufferB);
+    var squareVertexIndicesB = [
+      0, 1, 2,      1, 2, 3,    // A square is made of two triangles
+    ]
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(squareVertexIndicesB), gl.STATIC_DRAW);
+    squareVertexIndexBufferB.itemSize = 1;
+    squareVertexIndexBufferB.numItems = 6;
+
+
 
     // Also draw a small cube at the origin with color 0.5, 0.5, 0.5, 1.0
-    prepareSmallCube(0, 0, 0, 0.5, 0.5, 0.5, 1.0);
+    prepareSmallCube(0, 0, 0);
 
 
     cubeVertexPositionBuffer = gl.createBuffer();
@@ -274,7 +306,7 @@ function initBuffers() {
 }
 
 
-function prepareSmallCube(x, y, z, cr, cg, cb, co) {
+function prepareSmallCube(x, y, z) {
 
     smallcubeVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, smallcubeVertexPositionBuffer);
@@ -331,18 +363,16 @@ function prepareSmallCube(x, y, z, cr, cg, cb, co) {
     smallcubeVertexColorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, smallcubeVertexColorBuffer);
 
-    color = [cr, cg, cb, co];
-    var unpackedColors = [];
-    for (var j=0; j < 24; j++) {
-            unpackedColors = unpackedColors.concat(color);
-    }
+    // use this if you want things colored based on their location.
+    unpackedColors = colorVerticesRGB(vertices);
+
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
     smallcubeVertexColorBuffer.itemSize = 4;
     smallcubeVertexColorBuffer.numItems = 24;
 
     smallcubeVertexIndexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, smallcubeVertexIndexBuffer);
-    var cubeVertexIndices = [
+    var smallcubeVertexIndices = [
       0, 1, 2,      0, 2, 3,    // Front face
       4, 5, 6,      4, 6, 7,    // Back face
       8, 9, 10,     8, 10, 11,  // Top face
@@ -350,7 +380,7 @@ function prepareSmallCube(x, y, z, cr, cg, cb, co) {
       16, 17, 18,   16, 18, 19, // Right face
       20, 21, 22,   20, 22, 23  // Left face
     ]
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(smallcubeVertexIndices), gl.STATIC_DRAW);
     smallcubeVertexIndexBuffer.itemSize = 1;
     smallcubeVertexIndexBuffer.numItems = 36;
 
@@ -359,14 +389,20 @@ function prepareSmallCube(x, y, z, cr, cg, cb, co) {
 function colorVerticesRGB(vertices) {
 
     // To build the colors, we basically want to take x, y, z and hit them all with the function f(w) = (w+1)/2 since that sends -1 to 0 and 1 to 1.
-    colors = []
+    // To be careful, we want to send things below -1 to 0, and things above 1 to 1.
+    var colors = []
     for (var i = 0; i < vertices.length / 3; i++) {
         colors[4*i]     = (vertices[3*i]     + 1)/2;
         colors[4*i + 1] = (vertices[3*i + 1] + 1)/2;
         colors[4*i + 2] = (vertices[3*i + 2] + 1)/2;
         colors[4*i + 3] = 1.0;
     };
-
+    for (var i = 0; i < colors.length; i++) {
+        if (colors[i] < 0)
+            colors[i] = 0;
+        if (colors[i] > 1)
+            colors[i] = 1;
+    };
     return colors;
 
 }
@@ -387,8 +423,9 @@ function drawScene() {
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBufferR.itemSize, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferR);
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBufferR.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBufferR);
     setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBufferR.numItems);
+    gl.drawElements(gl.TRIANGLES, squareVertexIndexBufferR.numItems, gl.UNSIGNED_SHORT, 0);
     mvPopMatrix();
 
     mvPushMatrix();
@@ -397,8 +434,9 @@ function drawScene() {
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBufferG.itemSize, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferG);
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBufferG.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBufferG);
     setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBufferG.numItems);
+    gl.drawElements(gl.TRIANGLES, squareVertexIndexBufferG.numItems, gl.UNSIGNED_SHORT, 0);
     mvPopMatrix();
 
     mvPushMatrix();
@@ -407,8 +445,9 @@ function drawScene() {
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBufferB.itemSize, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBufferB);
     gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBufferB.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBufferB);
     setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBufferB.numItems);
+    gl.drawElements(gl.TRIANGLES, squareVertexIndexBufferB.numItems, gl.UNSIGNED_SHORT, 0);
     mvPopMatrix();
 
 
@@ -446,8 +485,8 @@ function animate() {
     if (lastTime != 0) {
       var elapsed = timeNow - lastTime;
 
-      rSquare -= (50 * elapsed) / 1000.0;
-      rCube -= (50 * elapsed) / 1000.0;
+      rSquare -= (40 * elapsed) / 1000.0;
+      rCube -= (40 * elapsed) / 1000.0;
     }
     lastTime = timeNow;
  }

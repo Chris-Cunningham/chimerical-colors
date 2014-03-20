@@ -284,15 +284,15 @@ function updateColor(sliderset){
     var colors = [
          1.0,  1.0,  (value_b + 1)/2,  1.0,
          0.0,  1.0,  (value_b + 1)/2,  1.0,
-         1.0, -1.0,  (value_b + 1)/2,  1.0,
-         0.0, -1.0,  (value_b + 1)/2,  1.0
+         1.0,  0.0,  (value_b + 1)/2,  1.0,
+         0.0,  0.0,  (value_b + 1)/2,  1.0
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
     //
     //  Update the small cube that marks where we are.
     //
-    prepareSmallCube(value_r, value_g, value_b, (value_r + 1)/2, (value_g + 1)/2, (value_b + 1)/2, 1.0)
+    prepareSmallCube(value_r, value_g, value_b)
 
     drawScene();												// This means "ok now draw the result please"
 
