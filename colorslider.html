@@ -29,6 +29,7 @@
 
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="webgl-utils.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
    precision mediump float;
@@ -163,7 +164,7 @@ function updateColor(sliderset){
 	infoBlue = document.getElementById('Blue'+sliderset+'info');
 	infoAGR = document.getElementById('agr'+sliderset)
 	infoABY = document.getElementById('aby'+sliderset)
-	infoAWB = document.getElementById('awb'+sliderset)
+	infoABW = document.getElementById('abw'+sliderset)
 	infoBright = document.getElementById('Bright'+sliderset+'info')
 	displaybox = document.getElementById('displaybox'+sliderset)
 
@@ -182,7 +183,7 @@ function updateColor(sliderset){
 	// Do the matrix transformation that makes color vision work
 	var value_agr = (value_r - value_g)/2;
 	var value_aby = (value_r + value_g)/4 - value_b / 2;
-	var value_awb = value_bright;
+	var value_abw = value_bright;
 
 	// Display the end result of the color info.
 	infoRed.innerHTML = 'Red : ' + (value_r).toFixed(2);
@@ -191,7 +192,7 @@ function updateColor(sliderset){
 	infoBright.innerHTML = 'Bright : ' + (value_bright).toFixed(2);
 	infoAGR.innerHTML = 'A(G/R) : ' + (value_agr).toFixed(2);
 	infoABY.innerHTML = 'A(B/Y) : ' + (value_aby).toFixed(2);
-	infoAWB.innerHTML = 'A(W/B) : ' + (value_awb).toFixed(2);
+	infoABW.innerHTML = 'A(W/B) : ' + (value_abw).toFixed(2);
 	infoBright.innerHTML = 'Bright: ' + (value_bright).toFixed(2);
 
 	// Grab the value for R, G, and B from 0 to 256. Convert to hex with .toString(16)
@@ -226,15 +227,27 @@ function updateColor(sliderset){
 	else
 		displaybox.style.color='black';
 	
-	// Try to interact with webGL.
-	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
-    colors = []
-    for (var i=0; i < 4; i++) {
-      //colors = colors.concat([0.5, 0.5, 1.0, 1.0]);
-      colors = colors.concat([perc_r, perc_g, perc_b, 1.0]);
-    }
+	// Interact with WebGL! 
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+    var vertices = [
+         1.0,  value_g,  1.0,
+        -1.0,  value_g,  1.0,
+         1.0,  value_g, -1.0,
+        -1.0,  value_g, -1.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+    var colors = [
+         1.0,  value_g,  1.0,  1.0,
+        -1.0,  value_g,  1.0,  1.0,
+         1.0,  value_g, -1.0,  1.0,
+        -1.0,  value_g, -1.0,  1.0
+    ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-    drawScene();
+
+    drawScene();												// This means "ok now draw the result please"
 
 }
 
@@ -319,7 +332,7 @@ function chimerical(color){
 
 	<div id='agr1' class='info'> A(G/R) = 0</div>
 	<div id='aby1' class='info'> A(B/Y) = 0</div>
-	<div id='awb1' class='info'> A(W/B) = -1</div>
+	<div id='abw1' class='info'> A(W/B) = -1</div>
 </td>
 <td valign='top'><h2>Foreground</h2>
 	<div id='Red2' class='bar'><div id='Red2slider' class='slider' style='background-color:red; width:50%'></div></div>
@@ -333,7 +346,7 @@ function chimerical(color){
 
 	<div id='agr2' class='info'> A(G/R) = 0</div>
 	<div id='aby2' class='info'> A(B/Y) = 0</div>
-	<div id='awb2' class='info'> A(W/B) = -1</div>
+	<div id='abw2' class='info'> A(W/B) = -1</div>
 </td>
 <td valign='top'>
 	<center><b>Fun Color Programs</b><br>
@@ -358,8 +371,7 @@ function chimerical(color){
 		<div id='displaybox2' style='height:350px; width:350px; background-color:#808080; -webkit-border-radius: 100%; -moz-border-radius: 100%; border-radius: 100%; display:table-cell; vertical-align: middle;'>X</div>
 	</td></tr></table>
 
-</td>
-<td>
+</td><td>
 
   <canvas id="glcanvas" width="500" height="500">
     Your browser doesn't appear to support the HTML5 <code>&lt;canvas&gt;</code> element.
