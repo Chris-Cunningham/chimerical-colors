@@ -551,7 +551,7 @@ function drawScene() {
 
     mvPushMatrix();
     mat4.rotate(mvMatrix, degToRad(rPrism), [1, 0, 0]);
-    mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
+    mat4.translate(mvMatrix, [6.0, 0.0, 0.0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, prismVertexPositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, prismVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, prismVertexColorBuffer);
